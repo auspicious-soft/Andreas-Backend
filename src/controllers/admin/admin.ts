@@ -1,23 +1,6 @@
 import { Request, Response } from "express"
-import { adminUserLoginSchema } from "../../validation/admin-user";
 import { formatZodErrors } from "../../validation/format-zod-errors";
-import {
-    loginService,
-    //  editInfoService, 
-    //  getInfoService,
-    newPassswordAfterOTPVerifiedService,
-    //   passwordResetService,
-    forgotPasswordService,
-    getDashboardStatsService,
-    sendLatestUpdatesService,
-    getAllUsersService,
-    getAUserService,
-    updateAUserService,
-    getIncomeDataService,
-    deleteAUserService,
-    addCreditsManuallyService
-    // updateDashboardStatsService 
-} from "../../services/admin/admin-service";
+import { loginService, newPassswordAfterOTPVerifiedService, forgotPasswordService, getAllUsersService, getAUserService, updateAUserService, deleteAUserService, getDashboardStatsService } from "../../services/admin/admin-service";
 import { errorParser } from "../../lib/errors/error-response-handler";
 import { httpStatusCode } from "../../lib/constant";
 import { z } from "zod";
@@ -36,43 +19,6 @@ export const login = async (req: Request, res: Response) => {
         return res.status(code || httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: message || "An error occurred" });
     }
 }
-
-// export const verifySession = async (req: Request, res: Response) => {
-//     try {
-//         const token = req.cookies["token"];
-//         if (!token) {
-//             return res.status(httpStatusCode.UNAUTHORIZED).json({ success: false, message: "Unauthorized" });
-//         }
-
-//         jwt.verify(token, process.env.JWT_SECRET!, (err: any, decoded: any) => {
-//             if (err) {
-//                 return res.status(httpStatusCode.UNAUTHORIZED).json({ success: false, message: "Unauthorized" });
-//             }
-//             res.status(httpStatusCode.OK).json({ success: true, data: decoded });
-//         })
-//     } catch (error) {
-//         console.log(error);
-//         res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Something went wrong" });
-//     }
-// }
-
-// export const passwordReset = async (req: Request, res: Response) => {
-//     const validation = passswordResetSchema.safeParse(req.body)
-//     const idValidation = testMongoIdSchema.safeParse((req.user as JwtPayload)?.id)
-//     if (!idValidation.success) return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: formatZodErrors(idValidation.error) })
-//     if (!validation.success) return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: formatZodErrors(validation.error) })
-//     const session = await mongoose.startSession();
-//     session.startTransaction();
-//     try {
-//         const response = await passwordResetService(req, res, session)
-//         return res.status(httpStatusCode.OK).json(response)
-//     } catch (error: any) {
-//         const { code, message } = errorParser(error)
-//         await session.abortTransaction();
-//         session.endSession();
-//         return res.status(code || httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: message || "An error occurred" });
-//     }
-// }
 
 export const forgotPassword = async (req: Request, res: Response) => {
 
@@ -138,29 +84,6 @@ export const updateAUser = async (req: Request, res: Response) => {
     }
 }
 
-
-export const addCreditsManually = async (req: Request, res: Response) => {
-    try {
-        const response = await addCreditsManuallyService(req.params.id, req.body.amount, res)
-        return res.status(httpStatusCode.OK).json(response)
-    } catch (error: any) {
-        const { code, message } = errorParser(error)
-        return res.status(code || httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: message || "An error occurred" });
-    }
-}
-
-
-
-export const sendLatestUpdates = async (req: Request, res: Response) => {
-    try {
-        const response = await sendLatestUpdatesService(req.body, res)
-        return res.status(httpStatusCode.OK).json(response)
-    } catch (error: any) {
-        const { code, message } = errorParser(error)
-        return res.status(code || httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: message || "An error occurred" });
-    }
-}
-// Dashboard
 export const getDashboardStats = async (req: Request, res: Response) => {
     try {
         const response = await getDashboardStatsService(req, res)
@@ -168,18 +91,5 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     } catch (error: any) {
         const { code, message } = errorParser(error)
         return res.status(code || httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: message || "An error occurred" });
-    }
-}
-
-
-
-export const getIncomeData = async (req: Request, res: Response) => {
-    try {
-        const response = await getIncomeDataService(req.query)
-        return res.status(httpStatusCode.OK).json(response)
-    } catch (error: any) {
-        const { code, message } = errorParser(error)
-        return res.status(code || httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: message || "An error occurred" });
-
     }
 }

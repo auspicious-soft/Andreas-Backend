@@ -7,12 +7,7 @@ import { generatePasswordResetToken, generatePasswordResetTokenByPhone, getPassw
 import { sendPasswordResetEmail } from "../../utils/mails/mail"
 import { generatePasswordResetTokenByPhoneWithTwilio } from "../../utils/sms/sms"
 import { httpStatusCode } from "../../lib/constant"
-import { passwordResetTokenModel } from "../../models/password-token-schema"
-import { projectsModel } from "src/models/user/projects-schema";
 import { customAlphabet } from "nanoid"
-import { increaseReferredCountAndCredits } from "src/utils"
-import { sendNotificationToUserService } from "../notifications/notifications"
-import mongoose from "mongoose"
 
 
 export const signupService = async (payload: any, res: Response) => {
@@ -156,19 +151,19 @@ export const passwordResetService = async (req: Request, res: Response) => {
 }
 
 export const getUserInfoService = async (id: string, res: Response) => {
-    const user = await usersModel.findById(id);
-    if (!user) return errorResponseHandler("User not found", httpStatusCode.NOT_FOUND, res);
+    // const user = await usersModel.findById(id);
+    // if (!user) return errorResponseHandler("User not found", httpStatusCode.NOT_FOUND, res);
   
-    const userProjects = await projectsModel.find({ userId: id }).select("-__v");
+    // const userProjects = await projectsModel.find({ userId: id }).select("-__v");
   
-    return {
-        success: true,
-        message: "User retrieved successfully",
-        data: {
-            user,
-            projects: userProjects.length > 0 ? userProjects : [],
-        }
-    };
+    // return {
+    //     success: true,
+    //     message: "User retrieved successfully",
+    //     data: {
+    //         user,
+    //         projects: userProjects.length > 0 ? userProjects : [],
+    //     }
+    // };
 }
 
 export const getUserInfoByEmailService = async (email: string, res: Response) => {
@@ -199,27 +194,27 @@ export const editUserInfoService = async (id: string, payload: any, res: Respons
 
 // Dashboard
 export const getDashboardStatsService = async (payload: any, res: Response) => {
-    //Ongoing project count
-    const userId = payload.currentUser
+    // //Ongoing project count
+    // const userId = payload.currentUser
 
-    // console.log("userid",userId);
+    // // console.log("userid",userId);
 
-    const ongoingProjectCount = await projectsModel.countDocuments({ userId, status: { $ne: "1" } })
+    // const ongoingProjectCount = await projectsModel.countDocuments({ userId, status: { $ne: "1" } })
 
-    const completedProjectCount = await projectsModel.countDocuments({ userId,status: "1" })
+    // const completedProjectCount = await projectsModel.countDocuments({ userId,status: "1" })
 
-    const workingProjectDetails = await projectsModel.find({ userId, status: { $ne: "1" } }).select("projectName projectimageLink status"); // Adjust the fields as needed
+    // const workingProjectDetails = await projectsModel.find({ userId, status: { $ne: "1" } }).select("projectName projectimageLink status"); // Adjust the fields as needed
     
 
-    const response = {
-        success: true,
-        message: "Dashboard stats fetched successfully",
-        data: {
-            ongoingProjectCount,
-            completedProjectCount,
-             workingProjectDetails,
-        }
-    }
+    // const response = {
+    //     success: true,
+    //     message: "Dashboard stats fetched successfully",
+    //     data: {
+    //         ongoingProjectCount,
+    //         completedProjectCount,
+    //          workingProjectDetails,
+    //     }
+    // }
 
-    return response
+    // return response
 }

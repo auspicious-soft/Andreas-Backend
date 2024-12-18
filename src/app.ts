@@ -4,7 +4,7 @@ import cors from "cors"
 import path from "path"
 import { fileURLToPath } from 'url'
 import connectDB from "./configF/db"
-import { admin, user, landing } from "./routes"
+import { admin, user } from "./routes"
 import { checkValidAdminRole } from "./utils"
 import bodyParser from 'body-parser'
 import { login } from "./controllers/admin/admin"
