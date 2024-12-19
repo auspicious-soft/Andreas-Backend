@@ -58,5 +58,5 @@ app.use("/api/verify-otp", verifyOtpPasswordReset)
 app.use("/api/new-password-otp-verified", newPassswordAfterOTPVerified)
 
 
-// app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
 export default app;

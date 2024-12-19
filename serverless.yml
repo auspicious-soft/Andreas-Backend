@@ -2,56 +2,38 @@ service: andreas-api
 
 provider:
   name: aws
-  runtime: nodejs22.x
+  runtime: nodejs18.x
   stage: ${opt:stage, 'dev'}
   region: eu-north-1
-  environment:
-    NODE_ENV: ${opt:stage, 'dev'}
-    MONGO_URL: ${env:MONGO_URL}
-    PORT: ${env:PORT}
-    NEXT_PUBLIC_APP_URL: ${env:NEXT_PUBLIC_APP_URL}
-    RESEND_API_KEY: ${env:RESEND_API_KEY}
-    COMPANY_RESEND_GMAIL_ACCOUNT: ${env:COMPANY_RESEND_GMAIL_ACCOUNT}
-    AUTH_SECRET: ${env:AUTH_SECRET}
-    JWT_SALT: ${env:JWT_SALT}
-    AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
-    AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
-    AWS_REGION: ${env:AWS_REGION}
-    AWS_BUCKET_NAME: ${env:AWS_BUCKET_NAME}
-    ACCOUNTSID: ${env:ACCOUNTSID}
-    AUTHTOKEN: ${env:AUTHTOKEN}
-    FROMPHONENUMBER: ${env:FROMPHONENUMBER}
     
 plugins:
   - serverless-dotenv-plugin
-  - serverless-plugin-typescript
+  - serverless-esbuild
   - serverless-offline
 
 custom:
-  serverlessPluginTypescript:
-    tsConfigFileLocation: './tsconfig.json'
+  serverless-offline:
+    httpPort: 8000
+    noPrependStageInUrl: true
   dotenv:
     path: .env.${opt:stage, 'dev'}
-    include:
-      - MONGO_URL
-      - PORT
-      - NEXT_PUBLIC_APP_URL
-      - RESEND_API_KEY
-      - COMPANY_RESEND_GMAIL_ACCOUNT
-      - AUTH_SECRET
-      - JWT_SALT
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
-      - AWS_REGION
-      - AWS_BUCKET_NAME
-      - ACCOUNTSID
-      - AUTHTOKEN
-      - FROMPHONENUMBER
+  esbuild:
+    bundle: true
+    minify: false
+    format: 'esm'
+    exclude: ['aws-sdk']
+    target: 'node18'
+    platform: 'node'
+    concurrency: 10
+    sourcemap: true
 
 functions:
   api:
     handler: src/lambda.handler
     events:
+      - http:
+          path: /
+          method: ANY
       - http:
           path: /{proxy+}
           method: ANY
@@ -67,13 +49,5 @@ functions:
               - X-Amz-Security-Token
               - X-Amz-User-Agent
             allowCredentials: true
-    timeout: 30 # Increase timeout for MongoDB operations
-    memorySize: 1024 # Adjust based on your needs
-
-package:
-  patterns:
-    - '!node_modules/.prisma/client/libquery_engine-*'
-    - 'node_modules/.prisma/client/libquery_engine-rhel-*'
-    - '!node_modules/prisma/libquery_engine-*'
-    - '!node_modules/@prisma/engines/**'
-    - '!tests/**'
+    timeout: 30
+    memorySize: 1024
