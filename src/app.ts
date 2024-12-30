@@ -11,11 +11,10 @@ import { login } from "./controllers/admin/admin"
 import { forgotPassword } from "./controllers/admin/admin"
 import {  verifyOtpPasswordReset, newPassswordAfterOTPVerified } from "./controllers/user/user";
 
+
 // Create __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url) // <-- Define __filename
 const __dirname = path.dirname(__filename)        // <-- Define __dirname
-
-
 
 const PORT = process.env.PORT || 8000
 const app = express()
