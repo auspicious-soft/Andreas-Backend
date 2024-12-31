@@ -30,7 +30,6 @@ import { avatarModel } from "src/models/admin/avatar-schema";
 
 export const loginService = async (payload: any, res: Response) => {
     const { username, password } = payload;
-    const countryCode = "+45"; 
     const toNumber = Number(username);
     const isEmail = isNaN(toNumber); 
     let user: any = null;
@@ -43,7 +42,7 @@ export const loginService = async (payload: any, res: Response) => {
         }
     } else {
 
-        const formattedPhoneNumber = `${countryCode}${username}`;
+        const formattedPhoneNumber = `${username}`;
         user = await adminModel.findOne({ phoneNumber: formattedPhoneNumber }).select('+password');
         if (!user) {
             user = await usersModel.findOne({ phoneNumber: formattedPhoneNumber }).select('+password');
@@ -70,7 +69,6 @@ export const loginService = async (payload: any, res: Response) => {
 
 export const forgotPasswordService = async (payload: any, res: Response) => {
     const { username } = payload;
-    const countryCode = "+45";
     const toNumber = Number(username);
     const isEmail = isNaN(toNumber);
     let user: any = null;
@@ -88,7 +86,7 @@ export const forgotPasswordService = async (payload: any, res: Response) => {
             return { success: true, message: "Password reset email sent with OTP" };
         }
     } else {
-        const formattedPhoneNumber = `${countryCode}${username}`;
+        const formattedPhoneNumber = `${username}`;
         user = await adminModel.findOne({ phoneNumber: formattedPhoneNumber }).select('+password');
         if (!user) {
             user = await usersModel.findOne({ phoneNumber: formattedPhoneNumber }).select('+password');
@@ -194,8 +192,6 @@ export const addCreditsManuallyService = async (id: string, amount: number, res:
 export const updateAUserService = async (id: string, payload: any, res: Response) => {
     const user = await usersModel.findById(id);
     if (!user) return errorResponseHandler("User not found", httpStatusCode.NOT_FOUND, res);
-    const countryCode = "+45";
-    payload.phoneNumber = `${countryCode}${payload.phoneNumber}`;
     const updateduser = await usersModel.findByIdAndUpdate(id,{ ...payload },{ new: true});
 
     return {

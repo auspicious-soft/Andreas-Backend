@@ -16,13 +16,12 @@ import mongoose from "mongoose"
 
 
 export const signupService = async (payload: any, res: Response) => {
-    const countryCode = "+45";
     const emailExists = await usersModel.findOne({ email: payload.email })
     if (emailExists) return errorResponseHandler("Email already exists", httpStatusCode.BAD_REQUEST, res)
-    const phoneExists = await usersModel.findOne({ phoneNumber: `${countryCode}${payload.phoneNumber}` });
-    if (phoneExists) return errorResponseHandler("phone Number already exists", httpStatusCode.BAD_REQUEST, res)
+    // const phoneExists = await usersModel.findOne({ phoneNumber: `${countryCode}${payload.phoneNumber}` });
+    // if (phoneExists) return errorResponseHandler("phone Number already exists", httpStatusCode.BAD_REQUEST, res)
 
-    payload.phoneNumber = `${countryCode}${payload.phoneNumber}`;
+    // payload.phoneNumber = `${countryCode}${payload.phoneNumber}`;
     const newPassword = bcrypt.hashSync(payload.password, 10)
     payload.password = newPassword
     const genId = customAlphabet('1234567890', 8)
@@ -184,8 +183,6 @@ export const getUserInfoByEmailService = async (email: string, res: Response) =>
 export const editUserInfoService = async (id: string, payload: any, res: Response) => {
     const user = await usersModel.findById(id);
     if (!user) return errorResponseHandler("User not found", httpStatusCode.NOT_FOUND, res);
-    const countryCode = "+45";
-    payload.phoneNumber = `${countryCode}${payload.phoneNumber}`;
     const updateduser = await usersModel.findByIdAndUpdate(id, { ...payload }, { new: true });
 
     return {
