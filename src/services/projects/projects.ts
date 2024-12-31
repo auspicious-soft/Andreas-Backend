@@ -81,7 +81,7 @@ export const getUserProjectsService = async (payload: any, res: Response) => {
     .select("-__v");
     
     if (results.length === 0) {
-       return errorResponseHandler("Project not found for this user", httpStatusCode.NOT_FOUND, res);
+       return errorResponseHandler("Project not found for this user", httpStatusCode.NO_CONTENT, res);
     }else{
         return {
             page,
@@ -140,7 +140,6 @@ export const createProjectService = async (payload: any, res: Response) => {
 
 export const updateAProjectService = async (payload: any, res: Response) => {
     const currentUserId = payload.currentUser;
-console.log("currentUserId",currentUserId)
 
     const project = await projectsModel.findById(payload.id);
     if (!project) return errorResponseHandler("Project not found", httpStatusCode.NOT_FOUND, res);

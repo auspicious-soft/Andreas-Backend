@@ -17,17 +17,17 @@ import mongoose from "mongoose"
 
 export const signupService = async (payload: any, res: Response) => {
     const countryCode = "+45";
-    const emailExists  = await usersModel.findOne({ email: payload.email })
-    if (emailExists ) return errorResponseHandler("Email already exists", httpStatusCode.BAD_REQUEST, res)
+    const emailExists = await usersModel.findOne({ email: payload.email })
+    if (emailExists) return errorResponseHandler("Email already exists", httpStatusCode.BAD_REQUEST, res)
     const phoneExists = await usersModel.findOne({ phoneNumber: `${countryCode}${payload.phoneNumber}` });
-    if (phoneExists ) return errorResponseHandler("phone Number already exists", httpStatusCode.BAD_REQUEST, res)
+    if (phoneExists) return errorResponseHandler("phone Number already exists", httpStatusCode.BAD_REQUEST, res)
 
     payload.phoneNumber = `${countryCode}${payload.phoneNumber}`;
     const newPassword = bcrypt.hashSync(payload.password, 10)
     payload.password = newPassword
     const genId = customAlphabet('1234567890', 8)
     const identifier = customAlphabet('0123456789', 3)
-    
+
     payload.myReferralCode = `${process.env.NEXT_PUBLIC_APP_URL}/signup?referralCode=${genId()}`
     payload.identifier = identifier()
     // if(payload.referralCode) {
@@ -94,12 +94,12 @@ export const newPassswordAfterOTPVerifiedService = async (payload: { password: s
     const existingToken = await getPasswordResetTokenByToken(otp)
     if (!existingToken) return errorResponseHandler("Invalid OTP", httpStatusCode.BAD_REQUEST, res)
 
-        // console.log("existingToken", existingToken);
+    // console.log("existingToken", existingToken);
 
     const hasExpired = new Date(existingToken.expires) < new Date()
     if (hasExpired) return errorResponseHandler("OTP expired", httpStatusCode.BAD_REQUEST, res)
 
-    let existingClient:any;
+    let existingClient: any;
 
     if (existingToken.email) {
         existingClient = await adminModel.findOne({ email: existingToken.email });
@@ -123,10 +123,10 @@ export const newPassswordAfterOTPVerifiedService = async (payload: { password: s
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    if(existingClient.role =='admin'){
+    if (existingClient.role == 'admin') {
         const response = await adminModel.findByIdAndUpdate(existingClient._id, { password: hashedPassword }, { new: true })
-    }else{
-        const response = await usersModel.findByIdAndUpdate(existingClient._id, { password: hashedPassword }, { new: true }) 
+    } else {
+        const response = await usersModel.findByIdAndUpdate(existingClient._id, { password: hashedPassword }, { new: true })
     }
 
 
@@ -158,9 +158,9 @@ export const passwordResetService = async (req: Request, res: Response) => {
 export const getUserInfoService = async (id: string, res: Response) => {
     const user = await usersModel.findById(id);
     if (!user) return errorResponseHandler("User not found", httpStatusCode.NOT_FOUND, res);
-  
+
     const userProjects = await projectsModel.find({ userId: id }).select("-__v");
-  
+
     return {
         success: true,
         message: "User retrieved successfully",
@@ -186,7 +186,7 @@ export const editUserInfoService = async (id: string, payload: any, res: Respons
     if (!user) return errorResponseHandler("User not found", httpStatusCode.NOT_FOUND, res);
     const countryCode = "+45";
     payload.phoneNumber = `${countryCode}${payload.phoneNumber}`;
-    const updateduser = await usersModel.findByIdAndUpdate(id,{ ...payload },{ new: true});
+    const updateduser = await usersModel.findByIdAndUpdate(id, { ...payload }, { new: true });
 
     return {
         success: true,
@@ -204,12 +204,12 @@ export const getDashboardStatsService = async (payload: any, res: Response) => {
 
     // console.log("userid",userId);
 
-    const ongoingProjectCount = await projectsModel.countDocuments({ userId, status: { $ne: "1" } })
+    const ongoingProjectCount = await projectsModel.countDocuments({ userId, status: { $ne: "4" } })
 
-    const completedProjectCount = await projectsModel.countDocuments({ userId,status: "1" })
+    const completedProjectCount = await projectsModel.countDocuments({ userId, status: "4" })
 
-    const workingProjectDetails = await projectsModel.find({ userId, status: { $ne: "1" } }).select("projectName projectimageLink status"); // Adjust the fields as needed
-    
+    const workingProjectDetails = await projectsModel.find({ userId, status: { $ne: "4" } }).select("projectName projectimageLink status"); // Adjust the fields as needed
+
 
     const response = {
         success: true,
@@ -217,7 +217,7 @@ export const getDashboardStatsService = async (payload: any, res: Response) => {
         data: {
             ongoingProjectCount,
             completedProjectCount,
-             workingProjectDetails,
+            workingProjectDetails,
         }
     }
 
