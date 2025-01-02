@@ -15,15 +15,11 @@ import {
 
 
 import { 
-    getUserProjects, 
-    createProject,
-    getAProject,
-    deleteAProject,
-    updateAProject,
-    translateVideo,
-    deleteProject,
-    getAllProjects
-
+   createProject,
+   getAProject,
+   deleteAProject,
+   updateAProject,
+   getAllProjects
 } from "src/controllers/projects/projects";
 
 import { 
@@ -46,7 +42,6 @@ import { checkMulter } from "../lib/errors/error-response-handler"
 import { forgotPassword } from "src/controllers/admin/admin";
 import { verifyOtpPasswordReset } from "src/controllers/user/user";
 import { sendNotificationToUser, sendNotificationToUsers } from "src/controllers/notifications/notifications";
-import { postAvatar, getAvatar, deleteAvatar } from "src/controllers/admin/avatar";
 import { checkAuth } from "src/middleware/check-auth";
 
 
@@ -73,10 +68,6 @@ router.route("/attachments/:id").get(checkAuth, getAattattachment).delete(checkA
 router.post("/users/add-credit/:id", checkAuth, addCreditsManually)
 router.get("/income", checkAuth, getIncomeData)
 
-
-router.post("/avatars",checkAuth, postAvatar)
-router.get("/avatars", checkAuth, getAvatar)
-router.delete("/avatars/:id", checkAuth, deleteAvatar)
 
 
 // router.get("/verify-session", verifySession);
