@@ -30,7 +30,7 @@ import { avatarModel } from "src/models/admin/avatar-schema";
 
 export const loginService = async (payload: any, res: Response) => {
     const { username, password } = payload;
-    const toNumber = Number(username);
+    const toNumber = Number(username)
     const isEmail = isNaN(toNumber); 
     let user: any = null;
 
