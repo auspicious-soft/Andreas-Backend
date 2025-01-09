@@ -10,6 +10,8 @@ const projectsSchema = new Schema({
     description: { type: String, required: true },
     associates: { type: [String], required: false },
     status: { type: String, required: false },
+    progress: { type: Number, required: false, default: 0 },
+    employeeId: { type: Schema.Types.ObjectId, required: true, ref: "employees" },
     createdby: { type: String, required: true },
 }, { timestamps: true })
 

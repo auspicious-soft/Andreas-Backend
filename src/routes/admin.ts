@@ -41,6 +41,7 @@ import { forgotPassword } from "src/controllers/admin/admin";
 import { verifyOtpPasswordReset } from "src/controllers/user/user";
 import { sendNotificationToUser, sendNotificationToUsers } from "src/controllers/notifications/notifications";
 import { checkAuth } from "src/middleware/check-auth";
+import { createEmployee, deleteEmployee, getAllEmployees, getEmployee, updateEmployee } from "src/controllers/employees/employees-controller";
 
 
 
@@ -61,6 +62,9 @@ router.post("/send-notification-to-specific-users", checkAuth, sendNotificationT
 router.route("/notes/:id").get(checkAuth, getAnotes).delete(checkAuth, deleteANote).post(checkAuth, createNote)
 
 router.route("/attachments/:id").get(checkAuth, getAattattachment).delete(checkAuth, deleteAattachment).post(checkAuth, createattachment)
+
+router.route("/employee").post(checkAuth, createEmployee).get(checkAuth, getAllEmployees)
+router.route("/employee/:id").get(checkAuth, getEmployee).delete(checkAuth, deleteEmployee).patch(checkAuth, updateEmployee)
 
 // router.get("/verify-session", verifySession);
 // router.patch("/update-password", passwordReset)
