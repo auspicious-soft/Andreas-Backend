@@ -5,7 +5,7 @@ import { errorResponseHandler } from "../../lib/errors/error-response-handler";
 import { httpStatusCode } from "../../lib/constant";
 import { queryBuilder } from "../../utils";
 import { subscribedEmailsModel } from "src/models/subscribed-email-schema";
-import { sendLatestUpdatesEmail, sendPasswordResetEmail } from "src/utils/mails/mail";
+import { sendEmailOfManualUserCreation, sendLatestUpdatesEmail, sendPasswordResetEmail } from "src/utils/mails/mail";
 import { generatePasswordResetToken, getPasswordResetTokenByToken, generatePasswordResetTokenByPhone } from "src/utils/mails/token";
 import { generatePasswordResetTokenByPhoneWithTwilio } from "../../utils/sms/sms"
 import mongoose from "mongoose";
@@ -14,6 +14,7 @@ import { usersModel } from "src/models/user/user-schema";
 import { IncomeModel } from "src/models/admin/income-schema";
 import { projectsModel } from "src/models/user/projects-schema";
 import { avatarModel } from "src/models/admin/avatar-schema";
+import { customAlphabet } from "nanoid";
 // import { clientModel } from "../../models/user/user-schema";
 // import { passswordResetSchema, testMongoIdSchema } from "../../validation/admin-user";
 // import { generatePasswordResetToken, getPasswordResetTokenByToken } from "../../lib/send-mail/tokens";
@@ -31,7 +32,7 @@ import { avatarModel } from "src/models/admin/avatar-schema";
 export const loginService = async (payload: any, res: Response) => {
     const { username, password } = payload;
     const toNumber = Number(username)
-    const isEmail = isNaN(toNumber); 
+    const isEmail = isNaN(toNumber);
     let user: any = null;
 
     if (isEmail) {
@@ -73,13 +74,13 @@ export const forgotPasswordService = async (payload: any, res: Response) => {
     const isEmail = isNaN(toNumber);
     let user: any = null;
     if (isEmail) {
-   
+
         user = await adminModel.findOne({ email: username }).select('+password');
         if (!user) {
             user = await usersModel.findOne({ email: username }).select('+password');
         }
         if (!user) return errorResponseHandler('User not found', httpStatusCode.NOT_FOUND, res);
-     
+
         const passwordResetToken = await generatePasswordResetToken(username);
         if (passwordResetToken) {
             await sendPasswordResetEmail(username, passwordResetToken.token);
@@ -92,7 +93,7 @@ export const forgotPasswordService = async (payload: any, res: Response) => {
             user = await usersModel.findOne({ phoneNumber: formattedPhoneNumber }).select('+password');
         }
         if (!user) return errorResponseHandler('User not found', httpStatusCode.NOT_FOUND, res);
-       
+
         const passwordResetTokenBySms = await generatePasswordResetTokenByPhone(formattedPhoneNumber);
         if (passwordResetTokenBySms) {
             await generatePasswordResetTokenByPhoneWithTwilio(formattedPhoneNumber, passwordResetTokenBySms.token);
@@ -114,14 +115,14 @@ export const newPassswordAfterOTPVerifiedService = async (payload: { password: s
     const hasExpired = new Date(existingToken.expires) < new Date()
     if (hasExpired) return errorResponseHandler("OTP expired", httpStatusCode.BAD_REQUEST, res)
 
-        let existingAdmin:any;
+    let existingAdmin: any;
 
-        if (existingToken.email) {
-          existingAdmin = await adminModel.findOne({ email: existingToken.email });
-        } 
-        else if (existingToken.phoneNumber) {
-          existingAdmin = await adminModel.findOne({ phoneNumber: existingToken.phoneNumber });
-        }
+    if (existingToken.email) {
+        existingAdmin = await adminModel.findOne({ email: existingToken.email });
+    }
+    else if (existingToken.phoneNumber) {
+        existingAdmin = await adminModel.findOne({ phoneNumber: existingToken.phoneNumber });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10)
     const response = await adminModel.findByIdAndUpdate(existingAdmin._id, { password: hashedPassword }, { new: true });
@@ -161,19 +162,19 @@ export const getAllUsersService = async (payload: any) => {
 }
 
 export const getAUserService = async (id: string, res: Response) => {
-  const user = await usersModel.findById(id);
-  if (!user) return errorResponseHandler("User not found", httpStatusCode.NOT_FOUND, res);
+    const user = await usersModel.findById(id);
+    if (!user) return errorResponseHandler("User not found", httpStatusCode.NOT_FOUND, res);
 
-  const userProjects = await projectsModel.find({ userId: id }).select("-__v");
+    const userProjects = await projectsModel.find({ userId: id }).select("-__v");
 
-  return {
-      success: true,
-      message: "User retrieved successfully",
-      data: {
-          user,
-          projects: userProjects.length > 0 ? userProjects : [],
-      }
-  };
+    return {
+        success: true,
+        message: "User retrieved successfully",
+        data: {
+            user,
+            projects: userProjects.length > 0 ? userProjects : [],
+        }
+    };
 }
 
 
@@ -192,7 +193,7 @@ export const addCreditsManuallyService = async (id: string, amount: number, res:
 export const updateAUserService = async (id: string, payload: any, res: Response) => {
     const user = await usersModel.findById(id);
     if (!user) return errorResponseHandler("User not found", httpStatusCode.NOT_FOUND, res);
-    const updateduser = await usersModel.findByIdAndUpdate(id,{ ...payload },{ new: true});
+    const updateduser = await usersModel.findByIdAndUpdate(id, { ...payload }, { new: true });
 
     return {
         success: true,
@@ -223,6 +224,31 @@ export const deleteAUserService = async (id: string, res: Response) => {
     }
 }
 
+export const createAUserService = async (payload: any, res: Response) => {
+    const { email } = payload
+    const existingUser = await usersModel.findOne({ email });
+    if (existingUser) {
+        return errorResponseHandler("User already exists", httpStatusCode.BAD_REQUEST, res);
+    }
+
+    const hashedPassword = bcrypt.hashSync(payload.password, 10);
+    const identifier = customAlphabet('0123456789', 3)();
+
+    const user = await usersModel.create({
+        ...payload,
+        password: hashedPassword,
+        identifier
+    })
+    const userResponse: any = user.toJSON();
+    delete userResponse.password;
+    await sendEmailOfManualUserCreation(payload.email, payload.password)
+    return {
+        success: true,
+        message: "User created successfully",
+        userResponse
+    }
+}
+
 export const sendLatestUpdatesService = async (payload: any, res: Response) => {
     const { message, title } = payload;
 
@@ -244,51 +270,25 @@ export const sendLatestUpdatesService = async (payload: any, res: Response) => {
 
 // Dashboard
 export const getDashboardStatsService = async (payload: any, res: Response) => {
-   
-    const ongoingProjectCount = await projectsModel.countDocuments({status: { $ne: "1" } })
-    const completedProjectCount = await projectsModel.countDocuments({status: "1" })
-    const workingProjectDetails = await projectsModel.find({status: { $ne: "1" } }).select("projectName projectimageLink projectstartDate projectendDate status identifier"); // Adjust the fields as needed
 
-    const sevenDaysAgo = new Date(new Date().setDate(new Date().getDate() - 7)) 
-    const recentProjectDetails = await projectsModel.find({createdAt: { $gte: sevenDaysAgo } }).select("projectName projectimageLink projectstartDate projectendDate identifier"); // Adjust the fields as needed
- 
+    const ongoingProjectCount = await projectsModel.countDocuments({ status: { $ne: "1" } })
+    const completedProjectCount = await projectsModel.countDocuments({ status: "1" })
+    const workingProjectDetails = await projectsModel.find({ status: { $ne: "1" } }).select("projectName projectimageLink projectstartDate projectendDate status identifier"); // Adjust the fields as needed
+
+    const sevenDaysAgo = new Date(new Date().setDate(new Date().getDate() - 7))
+    const recentProjectDetails = await projectsModel.find({ createdAt: { $gte: sevenDaysAgo } }).select("projectName projectimageLink projectstartDate projectendDate identifier"); // Adjust the fields as needed
+
     const response = {
         success: true,
         message: "Dashboard stats fetched successfully",
         data: {
-          ongoingProjectCount,
-          completedProjectCount,
-          workingProjectDetails,
-          recentProjectDetails,
+            ongoingProjectCount,
+            completedProjectCount,
+            workingProjectDetails,
+            recentProjectDetails,
         }
     }
 
     return response
-}
-
-// Client Services
-export const getIncomeDataService = async (payload: any) => {
-    const page = parseInt(payload.page as string) || 1
-    const limit = parseInt(payload.limit as string) || 10
-    const offset = (page - 1) * limit
-    const { query, sort } = queryBuilder(payload, ['userName'])
-    const totalDataCount = Object.keys(query).length < 1 ? await IncomeModel.countDocuments() : await IncomeModel.countDocuments(query)
-    const results = await IncomeModel.find(query).sort(sort).skip(offset).limit(limit).select("-__v")
-    if (results.length) return {
-        page,
-        limit,
-        success: true,
-        total: totalDataCount,
-        data: results
-    }
-    else {
-        return {
-            data: [],
-            page,
-            limit,
-            success: true,
-            total: 0
-        }
-    }
 }
 

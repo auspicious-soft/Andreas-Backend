@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-   return await resend.emails.send({
+    return await resend.emails.send({
         from: process.env.COMPANY_RESEND_GMAIL_ACCOUNT as string,
         to: email,
         subject: "Reset your password",
@@ -39,4 +39,18 @@ export const sendLatestUpdatesEmail = async (email: string, title: string, messa
             <p>${message}</p>
         `
     });
-};
+}
+
+export const sendEmailOfManualUserCreation = async (email: string, password: string) => {
+    return await resend.emails.send({
+        from: process.env.COMPANY_RESEND_GMAIL_ACCOUNT as string,
+        to: email,
+        subject: "Account Created",
+        html: `
+            <h3>Account created successfully</h3>
+            <p>Your email is ${email}</p>
+            <p>Your password is ${password}</p>
+            <p>Please Login to your account </p>
+        `
+    });
+}

@@ -1,35 +1,33 @@
 import { Router } from "express";
 import {
-    login,
+    createAUser,
     getDashboardStats,
     sendLatestUpdates,
     newPassswordAfterOTPVerified,
     getAllUsers,
     getAUser,
     updateAUser,
-    getIncomeData,
     deleteAUser,
-    addCreditsManually,
     //  updateDashboardStats
 } from "../controllers/admin/admin";
 
 
-import { 
-   createProject,
-   getAProject,
-   deleteAProject,
-   updateAProject,
-   getAllProjects
+import {
+    createProject,
+    getAProject,
+    deleteAProject,
+    updateAProject,
+    getAllProjects
 } from "src/controllers/projects/projects";
 
-import { 
+import {
     getAnotes,
     deleteANote,
     createNote
 
 } from "src/controllers/notes/notes";
 
-import { 
+import {
     getAattattachment,
     deleteAattachment,
     createattachment
@@ -53,7 +51,7 @@ router.patch("/new-password-otp-verified", newPassswordAfterOTPVerified)
 router.get("/dashboard", checkAuth, getDashboardStats)
 router.route("/projects").post(checkAuth, createProject).get(checkAuth, getAllProjects)
 router.route("/project/:id").get(checkAuth, getAProject).delete(checkAuth, deleteAProject).patch(checkAuth, updateAProject)
-router.get("/users", checkAuth, getAllUsers)
+router.route("/users").get(checkAuth, getAllUsers).post(checkAuth, createAUser)
 router.route("/users/:id").get(checkAuth, getAUser).delete(checkAuth, deleteAUser).patch(checkAuth, updateAUser)
 
 router.post("/send-latest-updates", checkAuth, sendLatestUpdates)
@@ -63,12 +61,6 @@ router.post("/send-notification-to-specific-users", checkAuth, sendNotificationT
 router.route("/notes/:id").get(checkAuth, getAnotes).delete(checkAuth, deleteANote).post(checkAuth, createNote)
 
 router.route("/attachments/:id").get(checkAuth, getAattattachment).delete(checkAuth, deleteAattachment).post(checkAuth, createattachment)
-
-
-router.post("/users/add-credit/:id", checkAuth, addCreditsManually)
-router.get("/income", checkAuth, getIncomeData)
-
-
 
 // router.get("/verify-session", verifySession);
 // router.patch("/update-password", passwordReset)
