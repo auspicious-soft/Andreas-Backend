@@ -105,7 +105,7 @@ export const createProjectService = async (payload: any, res: Response) => {
             ...payload,
         }).save();
 
-        if (payload.notes) {
+        if (payload.notes.length > 0) {
             const newNote = new notesModel({
                 text: payload.notes,  // The text field of the note
                 projectid: project._id,  // Referencing the project by its _id
