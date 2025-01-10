@@ -8,7 +8,6 @@ const projectsSchema = new Schema({
     projectstartDate: { type: String, required: false },
     projectendDate: { type: String, required: false },
     description: { type: String, required: false },
-    associates: { type: [String], required: false },
     status: { type: String, required: false },
     progress: { type: Number, required: false, default: 0 },
     employeeId: { type: [Schema.Types.ObjectId], required: false, ref: "employees" },
