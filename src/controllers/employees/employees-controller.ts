@@ -1,13 +1,7 @@
 import { Request, Response } from "express";
 import { httpStatusCode } from "src/lib/constant";
 import { errorParser } from "src/lib/errors/error-response-handler";
-import {
-    getAllEmployeesService,
-    getEmployeeService,
-    deleteEmployeeService,
-    createEmployeeService,
-    updateEmployeeService
-} from '../services/employee.service'
+import { getAllEmployeesService, getEmployeeService, deleteEmployeeService, createEmployeeService, updateEmployeeService} from '../services/employee.service'
 
 export const getAllEmployees = async (req: Request, res: Response) => {
     try {
