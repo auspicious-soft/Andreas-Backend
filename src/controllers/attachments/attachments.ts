@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import { httpStatusCode } from "src/lib/constant";
 import { errorParser } from "src/lib/errors/error-response-handler";
-import { getAattachmentsService ,deleteAattachmentService, createattachmentService} from "src/services/attachments/attachments";
+import { getAattachmentsService, deleteAattachmentService, createattachmentService } from "src/services/attachments/attachments";
 import { formatZodErrors } from "src/validation/format-zod-errors";
 
 
@@ -32,7 +32,7 @@ export const deleteAattachment = async (req: Request, res: Response) => {
 
 export const createattachment = async (req: Request, res: Response) => {
     try {
-        const response = await createattachmentService({currentUser : (req as any).currentUser,id:req.params.id, ...req.body}, res)
+        const response = await createattachmentService({ currentUser: (req as any).currentUser, id: req.params.id, ...req.body }, res)
         return res.status(httpStatusCode.CREATED).json(response)
     } catch (error: any) {
         const { code, message } = errorParser(error)

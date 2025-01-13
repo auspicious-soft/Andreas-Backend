@@ -72,6 +72,7 @@ export const createattachmentService = async (payload: any, res: Response) => {
     projectid: payload.id, // Referencing the project by its _id
     createdby: currentUserId,
     identifier: customAlphabet("0123456789", 5)(), // Optional: Create a unique identifier for the note
+    type: payload.type,
   });
 
   // Save the note
