@@ -12,6 +12,8 @@ const projectsSchema = new Schema({
     progress: { type: Number, required: false, default: 0 },
     employeeId: { type: [Schema.Types.ObjectId], required: false, ref: "employees" },
     createdby: { type: String, required: true },
+    constructionAddress: { type: String, required: false },
+    homeAddress: { type: String, required: false },
 }, { timestamps: true })
 
 export const projectsModel = model("projects", projectsSchema)
