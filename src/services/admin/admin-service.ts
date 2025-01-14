@@ -271,9 +271,9 @@ export const sendLatestUpdatesService = async (payload: any, res: Response) => {
 // Dashboard
 export const getDashboardStatsService = async (payload: any, res: Response) => {
 
-    const ongoingProjectCount = await projectsModel.countDocuments({ status: { $ne: "1" } })
-    const completedProjectCount = await projectsModel.countDocuments({ status: "1" })
-    const workingProjectDetails = await projectsModel.find({ status: { $ne: "1" } }).select("projectName projectimageLink projectstartDate projectendDate status identifier"); // Adjust the fields as needed
+    const ongoingProjectCount = await projectsModel.countDocuments({ progress: { $ne: 100 } })
+    const completedProjectCount = await projectsModel.countDocuments({ progress: 100 })
+    const workingProjectDetails = await projectsModel.find({ progress: { $ne: 100 } }).select("projectName projectimageLink projectstartDate projectendDate status identifier"); // Adjust the fields as needed
 
     const sevenDaysAgo = new Date(new Date().setDate(new Date().getDate() - 7))
     const recentProjectDetails = await projectsModel.find({ createdAt: { $gte: sevenDaysAgo } }).select("projectName projectimageLink projectstartDate projectendDate identifier"); // Adjust the fields as needed
