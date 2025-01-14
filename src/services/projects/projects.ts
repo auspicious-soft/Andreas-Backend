@@ -27,9 +27,9 @@ export const getAllProjectService = async (payload: any) => {
     // Add state filtering logic
     if (payload.state) {
         if (payload.state === "ongoing") {
-            (query as any).status = { $ne: "4" }; 
+            (query as any).status = { $ne: "4" };
         } else if (payload.state === "completed") {
-            (query as any).status = "4"; 
+            (query as any).status = "4";
         }
     }
 
@@ -60,29 +60,29 @@ export const getUserProjectsService = async (payload: any, res: Response) => {
     const limit = parseInt(payload.limit as string) || 0;
     const offset = (page - 1) * limit;
 
-    let { query, sort } = queryBuilder(payload, ['4']); 
+    let { query, sort } = queryBuilder(payload, ['4']);
 
     if (payload.state) {
         if (payload.state === "ongoing") {
-            (query as any).status = { $ne: "4" }; 
+            (query as any).status = { $ne: "4" };
         } else if (payload.state === "completed") {
-            (query as any).status = "4"; 
+            (query as any).status = "4";
         }
     }
 
-     (query as any).userId = id;
+    (query as any).userId = id;
 
     const totalDataCount = Object.keys(query).length < 1 ? await projectsModel.countDocuments() : await projectsModel.countDocuments(query);
     const results = await projectsModel
-    .find(query)
-    .sort(sort)
-    .skip(offset)
-    .limit(limit)
-    .select("-__v");
-    
+        .find(query)
+        .sort(sort)
+        .skip(offset)
+        .limit(limit)
+        .select("-__v");
+
     if (results.length === 0) {
-       return errorResponseHandler("Project not found for this user", httpStatusCode.NO_CONTENT, res);
-    }else{
+        return errorResponseHandler("Project not found for this user", httpStatusCode.NO_CONTENT, res);
+    } else {
         return {
             page,
             limit,
@@ -96,44 +96,45 @@ export const getUserProjectsService = async (payload: any, res: Response) => {
 }
 
 export const createProjectService = async (payload: any, res: Response) => {
-        const currentUserId = payload.currentUser
-        payload.createdby = currentUserId;
-        const identifier = customAlphabet('0123456789', 3);
-        payload.identifier = identifier();
+    const currentUserId = payload.currentUser
+    payload.createdby = currentUserId;
+    const identifier = customAlphabet('0123456789', 3);
+    payload.identifier = identifier();
 
-        const project = await new projectsModel({
-            ...payload,
-        }).save();
+    const project = await new projectsModel({
+        ...payload,
+    }).save();
 
-        if (payload.notes.length > 0) {
-            const newNote = new notesModel({
-                text: payload.notes,  // The text field of the note
-                projectid: project._id,  // Referencing the project by its _id
-                identifier: customAlphabet('0123456789', 5)(),  // Optional: Create a unique identifier for the note
-            });
+    if (payload.notes.length > 0) {
+        const newNote = new notesModel({
+            text: payload.notes,  // The text field of the note
+            projectid: project._id,  // Referencing the project by its _id
+            identifier: customAlphabet('0123456789', 5)(),  // Optional: Create a unique identifier for the note
+        });
 
-            // Save the note
-            const createdNote = await newNote.save();
-    
-        }
+        // Save the note
+        await newNote.save();
 
-        if (payload.attachments) {
-            const newNote = new attachmentsModel({
-                url: payload.attachments,  // The text field of the note
-                projectid: project._id,  // Referencing the project by its _id
-                createdby:currentUserId,
-                identifier: customAlphabet('0123456789', 5)(),  // Optional: Create a unique identifier for the note
-            });
+    }
 
-            // Save the note
-            const createdNote = await newNote.save();
-    
-        }
-        return {
-            success: true,
-            message: "Project created successfully"
-            
-        }
+    if (payload.attachments && payload.type) {
+        const newaAtachement = new attachmentsModel({
+            url: payload.attachments,  // The text field of the note
+            projectid: project._id,  // Referencing the project by its _id
+            createdby: currentUserId,
+            identifier: customAlphabet('0123456789', 5)(),  // Optional: Create a unique identifier for the note
+            type: payload.type
+        });
+
+        // Save the Attachment
+        await newaAtachement.save();
+
+    }
+    return {
+        success: true,
+        message: "Project created successfully"
+
+    }
 };
 
 
@@ -145,7 +146,7 @@ export const updateAProjectService = async (payload: any, res: Response) => {
     if (!project) return errorResponseHandler("Project not found", httpStatusCode.NOT_FOUND, res);
 
 
-    const updatedProject = await projectsModel.findByIdAndUpdate(payload.id,{ ...payload },{ new: true});
+    const updatedProject = await projectsModel.findByIdAndUpdate(payload.id, { ...payload }, { new: true });
 
     return {
         success: true,
@@ -159,13 +160,13 @@ export const updateAProjectService = async (payload: any, res: Response) => {
 export const getAprojectService = async (id: string, res: Response) => {
 
     const project = await projectsModel.findById(id).populate("userId");
-        if (!project) return errorResponseHandler("Project not found", httpStatusCode.NOT_FOUND, res);
-        return {
-            success: true,
-            message: "Project retrieved successfully",
-            data: project
-            
-        };
+    if (!project) return errorResponseHandler("Project not found", httpStatusCode.NOT_FOUND, res);
+    return {
+        success: true,
+        message: "Project retrieved successfully",
+        data: project
+
+    };
 
 };
 
@@ -181,7 +182,7 @@ export const deleteAProjectService = async (id: string, res: Response) => {
     return {
         success: true,
         message: "Project deleted successfully"
-        
+
     }
 }
 
