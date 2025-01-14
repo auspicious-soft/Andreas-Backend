@@ -205,7 +205,7 @@ export const getDashboardStatsService = async (payload: any, res: Response) => {
 
     const completedProjectCount = await projectsModel.countDocuments({ userId, status: "4" })
 
-    const workingProjectDetails = await projectsModel.find({ userId, status: { $ne: "4" } }).select("projectName projectimageLink status"); // Adjust the fields as needed
+    const workingProjectDetails = await projectsModel.find({ userId, status: { $ne: "4" } }).select("projectName projectimageLink status progress"); // Adjust the fields as needed
 
 
     const response = {
