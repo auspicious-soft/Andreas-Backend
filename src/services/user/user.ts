@@ -10,7 +10,6 @@ import { httpStatusCode } from "../../lib/constant"
 import { passwordResetTokenModel } from "../../models/password-token-schema"
 import { projectsModel } from "src/models/user/projects-schema";
 import { customAlphabet } from "nanoid"
-import { increaseReferredCountAndCredits } from "src/utils"
 import { sendNotificationToUserService } from "../notifications/notifications"
 import mongoose from "mongoose"
 
@@ -201,11 +200,11 @@ export const getDashboardStatsService = async (payload: any, res: Response) => {
 
     // console.log("userid",userId);
 
-    const ongoingProjectCount = await projectsModel.countDocuments({ userId, status: { $ne: "4" } })
+    const ongoingProjectCount = await projectsModel.countDocuments({ userId, progress: { $ne: 100 } })
 
-    const completedProjectCount = await projectsModel.countDocuments({ userId, status: "4" })
+    const completedProjectCount = await projectsModel.countDocuments({ userId, progress: 100 })
 
-    const workingProjectDetails = await projectsModel.find({ userId, status: { $ne: "4" } }).select("projectName projectimageLink status progress"); // Adjust the fields as needed
+    const workingProjectDetails = await projectsModel.find({ userId, progress: { $ne: 100 } }).select("projectName projectimageLink status progress"); // Adjust the fields as needed
 
 
     const response = {

@@ -9,7 +9,6 @@ import { formatZodErrors } from "src/validation/format-zod-errors";
 
 export const getAllProjects = async (req: Request, res: Response) => {
     try {
-        // console.log(req.query);
         const response = await getAllProjectService(req.query)
         return res.status(httpStatusCode.OK).json(response)
     } catch (error: any) {

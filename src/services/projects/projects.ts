@@ -27,9 +27,9 @@ export const getAllProjectService = async (payload: any) => {
     // Add state filtering logic
     if (payload.state) {
         if (payload.state === "ongoing") {
-            (query as any).status = { $ne: "4" };
+            (query as any).progress = { $ne: 100 };
         } else if (payload.state === "completed") {
-            (query as any).status = "4";
+            (query as any).progress = 100;
         }
     }
 
