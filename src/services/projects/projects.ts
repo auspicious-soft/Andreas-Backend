@@ -22,7 +22,7 @@ export const getAllProjectService = async (payload: any) => {
     const limit = parseInt(payload.limit as string) || 0;
     const offset = (page - 1) * limit;
 
-    let { query, sort } = queryBuilder(payload, ['4']); // Assuming queryBuilder helps create initial query and sort objects.
+    let { query, sort } = queryBuilder(payload, ['projectName']); // Assuming queryBuilder helps create initial query and sort objects.
 
     // Add state filtering logic
     if (payload.state) {
