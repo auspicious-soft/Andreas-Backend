@@ -5,6 +5,8 @@ import mongoose, { SortOrder } from "mongoose"
 import { generateSignedUrlToUploadOn } from "src/configF/s3"
 import { httpStatusCode } from "src/lib/constant"
 import { errorResponseHandler } from "src/lib/errors/error-response-handler"
+import { adminModel } from "src/models/admin/admin-schema"
+import { employeeModel } from "src/models/admin/employees-schema"
 import { usersModel } from "src/models/user/user-schema"
 configDotenv()
 
@@ -150,4 +152,13 @@ export const flaskTranslateVideo = async (payload: any, res: Response) => {
     } catch (error) {
         return errorResponseHandler("An error occurred during the API call in flaskTranslateVideo", httpStatusCode.INTERNAL_SERVER_ERROR, res);
     }
+}
+
+export const isEmailTaken = async (email: string): Promise<boolean> => {
+    const models = [usersModel, adminModel, employeeModel];
+    for (const model of models) {
+        const user = await (model as any).findOne({ email: email.toLowerCase() });
+        if (user) return true;
+    }
+    return false;
 }

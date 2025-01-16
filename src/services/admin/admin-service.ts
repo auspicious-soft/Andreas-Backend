@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { Response } from "express";
 import { errorResponseHandler } from "../../lib/errors/error-response-handler";
 import { httpStatusCode } from "../../lib/constant";
-import { queryBuilder } from "../../utils";
+import { isEmailTaken, queryBuilder } from "../../utils";
 import { subscribedEmailsModel } from "src/models/subscribed-email-schema";
 import { sendEmailOfManualUserCreation, sendLatestUpdatesEmail, sendPasswordResetEmail } from "src/utils/mails/mail";
 import { generatePasswordResetToken, getPasswordResetTokenByToken, generatePasswordResetTokenByPhone } from "src/utils/mails/token";
@@ -15,6 +15,7 @@ import { IncomeModel } from "src/models/admin/income-schema";
 import { projectsModel } from "src/models/user/projects-schema";
 import { avatarModel } from "src/models/admin/avatar-schema";
 import { customAlphabet } from "nanoid";
+import { employeeModel } from "src/models/admin/employees-schema";
 // import { clientModel } from "../../models/user/user-schema";
 // import { passswordResetSchema, testMongoIdSchema } from "../../validation/admin-user";
 // import { generatePasswordResetToken, getPasswordResetTokenByToken } from "../../lib/send-mail/tokens";
@@ -40,6 +41,9 @@ export const loginService = async (payload: any, res: Response) => {
         user = await adminModel.findOne({ email: username }).select('+password');
         if (!user) {
             user = await usersModel.findOne({ email: username }).select('+password');
+        }
+        if (!user) {
+            user = await employeeModel.findOne({ email: username }).select('+password');
         }
     } else {
 
@@ -226,11 +230,7 @@ export const deleteAUserService = async (id: string, res: Response) => {
 
 export const createAUserService = async (payload: any, res: Response) => {
     const { email } = payload
-    const existingUser = await usersModel.findOne({ email });
-    if (existingUser) {
-        return errorResponseHandler("User already exists", httpStatusCode.BAD_REQUEST, res);
-    }
-
+    if (await isEmailTaken(email)) return errorResponseHandler("User already exists", httpStatusCode.BAD_REQUEST, res)
     const hashedPassword = bcrypt.hashSync(payload.password, 10);
     const identifier = customAlphabet('0123456789', 3)();
 

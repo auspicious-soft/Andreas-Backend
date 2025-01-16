@@ -4,7 +4,7 @@ import cors from "cors"
 import path from "path"
 import { fileURLToPath } from 'url'
 import connectDB from "./configF/db"
-import { admin, user, landing } from "./routes"
+import { admin, user, landing, employee } from "./routes"
 import { checkValidAdminRole } from "./utils"
 import bodyParser from 'body-parser'
 import { login } from "./controllers/admin/admin"
@@ -53,6 +53,7 @@ app.get("/", (_, res: any) => {
 
 app.use("/api/admin", checkValidAdminRole, admin);
 app.use("/api/user", user);
+app.use("/api/employee", employee);
 app.use("/api/login", login);
 app.use("/api/forgot-password", forgotPassword);
 app.use("/api/verify-otp", verifyOtpPasswordReset)
