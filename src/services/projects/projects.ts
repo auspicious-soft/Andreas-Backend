@@ -158,8 +158,8 @@ export const updateAProjectService = async (payload: any, res: Response) => {
 
 
 export const getAprojectService = async (id: string, res: Response) => {
-
-    const project = await projectsModel.findById(id).populate("userId");
+    if(!id) return errorResponseHandler("Project id is required", httpStatusCode.BAD_REQUEST, res)
+    const project = await projectsModel.findById(id).populate("userId").populate("employeeId")
     if (!project) return errorResponseHandler("Project not found", httpStatusCode.NOT_FOUND, res);
     return {
         success: true,
