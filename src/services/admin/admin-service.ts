@@ -239,7 +239,7 @@ export const createAUserService = async (payload: any, res: Response) => {
         password: hashedPassword,
         identifier
     })
-    const userResponse: any = user.toJSON();
+    const userResponse: any = user.toJSON();    
     delete userResponse.password;
     await sendEmailOfManualUserCreation(payload.email, payload.password)
     return {

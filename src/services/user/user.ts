@@ -12,6 +12,7 @@ import { projectsModel } from "src/models/user/projects-schema";
 import { customAlphabet } from "nanoid"
 import { sendNotificationToUserService } from "../notifications/notifications"
 import mongoose from "mongoose"
+import { tabsModel } from "src/models/tab-schema";
 
 
 export const signupService = async (payload: any, res: Response) => {
@@ -195,10 +196,7 @@ export const editUserInfoService = async (id: string, payload: any, res: Respons
 
 // Dashboard
 export const getDashboardStatsService = async (payload: any, res: Response) => {
-    //Ongoing project count
     const userId = payload.currentUser
-
-    // console.log("userid",userId);
 
     const ongoingProjectCount = await projectsModel.countDocuments({ userId, progress: { $ne: 100 } })
 
@@ -218,4 +216,24 @@ export const getDashboardStatsService = async (payload: any, res: Response) => {
     }
 
     return response
+}
+
+export const getTabsService = async (req: Request, res: Response) => {
+    const tabs = await tabsModel.find()
+    return {
+        success: true,
+        message: "Tabs fetched successfully",
+        data: tabs
+    }
+}
+
+export const createTabService = async (payload: any, res: Response) => {
+    const { name, type } = payload
+    const tab = new tabsModel({ name, type })
+    const response = await tab.save()
+    return {
+        success: true,
+        message: "Tab created successfully",
+        data: response
+    }
 }

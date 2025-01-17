@@ -1,18 +1,17 @@
 import { Request, Response } from "express"
 import { httpStatusCode } from "../../lib/constant"
 import { errorParser } from "../../lib/errors/error-response-handler"
-import { clientEditSchema, clientSignupSchema, passswordResetSchema } from "../../validation/client-user"
+import { clientSignupSchema, passswordResetSchema } from "../../validation/client-user"
 import { formatZodErrors } from "../../validation/format-zod-errors"
-import { loginService, signupService, forgotPasswordService, newPassswordAfterOTPVerifiedService, passwordResetService, getDashboardStatsService, getUserInfoService, getUserInfoByEmailService, editUserInfoService, verifyOtpPasswordResetService } from "../../services/user/user"
-import { z } from "zod"
-import mongoose from "mongoose"
-import { adminUserLoginSchema } from "src/validation/admin-user"
+import { loginService, signupService, getTabsService, createTabService, forgotPasswordService, newPassswordAfterOTPVerifiedService, passwordResetService, getDashboardStatsService, getUserInfoService, getUserInfoByEmailService, editUserInfoService, verifyOtpPasswordResetService
+} from "../../services/user/user"
+import exp from "constants"
 
 export const signup = async (req: Request, res: Response) => {
     const validation = clientSignupSchema.safeParse(req.body)
     if (!validation.success) return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: formatZodErrors(validation.error) })
     try {
-        const response:any = await signupService(req.body, res)
+        const response: any = await signupService(req.body, res)
         return res.status(httpStatusCode.CREATED).json(response)
     }
     catch (error: any) {
@@ -125,5 +124,22 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     }
 }
 
+export const getTabs = async (req: Request, res: Response) => {
+    try {
+        const response = await getTabsService(req, res)
+        return res.status(httpStatusCode.OK).json(response)
+    } catch (error: any) {
+        const { code, message } = errorParser(error)
+        return res.status(code || httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: message || "An error occurred" });
+    }
+}
 
-
+export const createTab = async (req: Request, res: Response) => {
+    try {
+        const response = await createTabService(req.body, res)
+        return res.status(httpStatusCode.CREATED).json(response)
+    } catch (error: any) {
+        const { code, message } = errorParser(error)
+        return res.status(code || httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: message || "An error occurred" });
+    }
+}

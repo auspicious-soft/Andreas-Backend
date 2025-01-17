@@ -51,6 +51,7 @@ export const sendEmailOfManualUserCreation = async (email: string, password: str
             <p>Your email is ${email}</p>
             <p>Your password is ${password}</p>
             <p>Please Login to your account </p>
+            <a style="color: blue; text-decoration: underline;" href="https://anfritidshuse.eu">Click here to login</a>
         `
     });
 }

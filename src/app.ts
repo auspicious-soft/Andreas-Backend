@@ -9,7 +9,7 @@ import { checkValidAdminRole } from "./utils"
 import bodyParser from 'body-parser'
 import { login } from "./controllers/admin/admin"
 import { forgotPassword } from "./controllers/admin/admin"
-import {  verifyOtpPasswordReset, newPassswordAfterOTPVerified } from "./controllers/user/user";
+import { verifyOtpPasswordReset, newPassswordAfterOTPVerified, getTabs, createTab } from "./controllers/user/user";
 
 
 // Create __dirname equivalent for ES modules
@@ -20,20 +20,20 @@ const PORT = process.env.PORT || 8000
 const app = express()
 app.set("trust proxy", true)
 app.use(bodyParser.json({
-    verify: (req: any, res, buf) => {
-      req.rawBody = buf.toString();
-    }
-  }));
+  verify: (req: any, res, buf) => {
+    req.rawBody = buf.toString();
+  }
+}));
 // app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
-    cors({
-        origin: "*",
-        methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
-        credentials: true,
-    })
+  cors({
+    origin: "*",
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
+    credentials: true,
+  })
 );
 
 
@@ -48,7 +48,7 @@ connectDB();
 
 
 app.get("/", (_, res: any) => {
-    res.send("Hello world entry point 🚀✅");
+  res.send("Hello world entry point 🚀✅");
 });
 
 app.use("/api/admin", checkValidAdminRole, admin);
@@ -58,7 +58,7 @@ app.use("/api/login", login);
 app.use("/api/forgot-password", forgotPassword);
 app.use("/api/verify-otp", verifyOtpPasswordReset)
 app.use("/api/new-password-otp-verified", newPassswordAfterOTPVerified)
-
+app.route("/api/tabs").get(getTabs).post(createTab)
 
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
 export default app;
