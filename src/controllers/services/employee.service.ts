@@ -112,7 +112,7 @@ export const getDashboardStatsService = async (payload: any, res: Response) => {
     const page = parseInt(payload.page as string) || 1;
     const limit = parseInt(payload.limit as string) || 10
     const offset = (page - 1) * limit;
-    let { query } = queryBuilder(payload, ['projectName']);
+    let { query } = queryBuilder(payload, ['projectName', 'identifier']);
     if (payload.state) {
         if (payload.state === "ongoing") {
             (query as any).progress = { $ne: 100 };

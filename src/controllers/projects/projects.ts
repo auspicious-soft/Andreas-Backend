@@ -3,8 +3,6 @@ import mongoose from "mongoose";
 import { httpStatusCode } from "src/lib/constant";
 import { errorParser } from "src/lib/errors/error-response-handler";
 import { getAllProjectService, createProjectService, getAprojectService, deleteAProjectService, updateAProjectService, getUserProjectsService, deleteProjectService } from "src/services/projects/projects";
-import { requestAudioToVideoSchema, requestTextToVideoSchema, requestVideoTranslationSchema } from "src/validation/client-user";
-import { formatZodErrors } from "src/validation/format-zod-errors";
 
 
 export const getAllProjects = async (req: Request, res: Response) => {
@@ -20,7 +18,7 @@ export const getAllProjects = async (req: Request, res: Response) => {
 
 export const createProject = async (req: Request, res: Response) => {
     try {
-        const response = await createProjectService({currentUser : (req as any).currentUser, ...req.body}, res)
+        const response = await createProjectService({ currentUser: (req as any).currentUser, ...req.body }, res)
         return res.status(httpStatusCode.CREATED).json(response)
     } catch (error: any) {
         const { code, message } = errorParser(error)
@@ -30,8 +28,8 @@ export const createProject = async (req: Request, res: Response) => {
 
 export const updateAProject = async (req: Request, res: Response) => {
     try {
-        const response = await updateAProjectService({currentUser : (req as any).currentUser,id:req.params.id,...req.body}, res);
-        
+        const response = await updateAProjectService({ currentUser: (req as any).currentUser, id: req.params.id, ...req.body }, res);
+
         return res.status(httpStatusCode.OK).json(response)
     } catch (error: any) {
         const { code, message } = errorParser(error)

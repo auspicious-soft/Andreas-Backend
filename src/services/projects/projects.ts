@@ -22,7 +22,7 @@ export const getAllProjectService = async (payload: any) => {
     const limit = parseInt(payload.limit as string) || 0;
     const offset = (page - 1) * limit;
 
-    let { query, sort } = queryBuilder(payload, ['projectName']); // Assuming queryBuilder helps create initial query and sort objects.
+    let { query, sort } = queryBuilder(payload, ['projectName', 'identifier']); // Assuming queryBuilder helps create initial query and sort objects.
 
     // Add state filtering logic
     if (payload.state) {
@@ -60,7 +60,7 @@ export const getUserProjectsService = async (payload: any, res: Response) => {
     const limit = parseInt(payload.limit as string) || 0;
     const offset = (page - 1) * limit;
 
-    let { query, sort } = queryBuilder(payload, ['4']);
+    let { query, sort } = queryBuilder(payload, ['identifier', 'projectName']); // Assuming queryBuilder helps create initial query and sort objects.
 
     if (payload.state) {
         if (payload.state === "ongoing") {
@@ -100,10 +100,7 @@ export const createProjectService = async (payload: any, res: Response) => {
     payload.createdby = currentUserId;
     const identifier = customAlphabet('0123456789', 3);
     payload.identifier = identifier();
-
-    const project = await new projectsModel({
-        ...payload,
-    }).save();
+    const project = await new projectsModel({ ...payload }).save();
 
     if (payload.notes.length > 0) {
         const newNote = new notesModel({
@@ -114,7 +111,6 @@ export const createProjectService = async (payload: any, res: Response) => {
 
         // Save the note
         await newNote.save();
-
     }
 
     if (payload.attachments && payload.type) {
@@ -158,7 +154,7 @@ export const updateAProjectService = async (payload: any, res: Response) => {
 
 
 export const getAprojectService = async (id: string, res: Response) => {
-    if(!id) return errorResponseHandler("Project id is required", httpStatusCode.BAD_REQUEST, res)
+    if (!id) return errorResponseHandler("Project id is required", httpStatusCode.BAD_REQUEST, res)
     const project = await projectsModel.findById(id).populate("userId").populate("employeeId")
     if (!project) return errorResponseHandler("Project not found", httpStatusCode.NOT_FOUND, res);
     return {
