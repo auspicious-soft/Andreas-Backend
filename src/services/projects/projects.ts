@@ -133,17 +133,17 @@ export const createProjectService = async (payload: any, res: Response) => {
     }
 };
 
-
-
 export const updateAProjectService = async (payload: any, res: Response) => {
+    let finalPayload = { ...payload }
     const currentUserId = payload.currentUser;
-
     const project = await projectsModel.findById(payload.id);
     if (!project) return errorResponseHandler("Project not found", httpStatusCode.NOT_FOUND, res);
-
-
-    const updatedProject = await projectsModel.findByIdAndUpdate(payload.id, { ...payload }, { new: true });
-
+    if(payload.status) {
+        if(project.status?.includes(payload.status)) delete finalPayload.status
+        else finalPayload.status = [...project.status!, payload.status]
+    }
+    
+    const updatedProject = await projectsModel.findByIdAndUpdate(payload.id, { ...finalPayload }, { new: true });
     return {
         success: true,
         message: "Project updated successfully",
@@ -161,12 +161,9 @@ export const getAprojectService = async (id: string, res: Response) => {
         success: true,
         message: "Project retrieved successfully",
         data: project
-
     };
 
-};
-
-
+}
 
 export const deleteAProjectService = async (id: string, res: Response) => {
     const user = await projectsModel.findById(id);
