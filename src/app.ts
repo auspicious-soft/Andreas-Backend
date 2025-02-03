@@ -9,7 +9,7 @@ import { checkValidAdminRole } from "./utils"
 import bodyParser from 'body-parser'
 import { login } from "./controllers/admin/admin"
 import { forgotPassword } from "./controllers/admin/admin"
-import { verifyOtpPasswordReset, newPassswordAfterOTPVerified, getTabs, createTab } from "./controllers/user/user";
+import { verifyOtpPasswordReset, newPassswordAfterOTPVerified, getTabs, createTab, deleteATab } from "./controllers/user/user";
 
 
 // Create __dirname equivalent for ES modules
@@ -59,6 +59,6 @@ app.use("/api/forgot-password", forgotPassword);
 app.use("/api/verify-otp", verifyOtpPasswordReset)
 app.use("/api/new-password-otp-verified", newPassswordAfterOTPVerified)
 app.route("/api/tabs").get(getTabs).post(createTab)
-
+app.delete("/api/tabs/:id", deleteATab)
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
 export default app;

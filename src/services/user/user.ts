@@ -237,3 +237,12 @@ export const createTabService = async (payload: any, res: Response) => {
         data: response
     }
 }
+
+export const deleteATabService = async (id: string, res: Response) => {
+    const response = await tabsModel.findByIdAndDelete(id)
+    return {
+        success: true,
+        message: "Tab deleted successfully",
+        data: response
+    }
+}

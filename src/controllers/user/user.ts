@@ -3,7 +3,7 @@ import { httpStatusCode } from "../../lib/constant"
 import { errorParser } from "../../lib/errors/error-response-handler"
 import { clientSignupSchema, passswordResetSchema } from "../../validation/client-user"
 import { formatZodErrors } from "../../validation/format-zod-errors"
-import { loginService, signupService, getTabsService, createTabService, forgotPasswordService, newPassswordAfterOTPVerifiedService, passwordResetService, getDashboardStatsService, getUserInfoService, getUserInfoByEmailService, editUserInfoService, verifyOtpPasswordResetService
+import { loginService, signupService, getTabsService, createTabService, forgotPasswordService, newPassswordAfterOTPVerifiedService, passwordResetService, getDashboardStatsService, getUserInfoService, getUserInfoByEmailService, editUserInfoService, verifyOtpPasswordResetService, deleteATabService
 } from "../../services/user/user"
 import exp from "constants"
 
@@ -138,6 +138,18 @@ export const createTab = async (req: Request, res: Response) => {
     try {
         const response = await createTabService(req.body, res)
         return res.status(httpStatusCode.CREATED).json(response)
+    } catch (error: any) {
+        const { code, message } = errorParser(error)
+        return res.status(code || httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: message || "An error occurred" });
+    }
+}
+
+
+export const deleteATab = async (req: Request, res: Response) => { 
+    const { id } = req.params
+    try {
+        const response = await deleteATabService(id, res)
+        return res.status(httpStatusCode.OK).json(response)
     } catch (error: any) {
         const { code, message } = errorParser(error)
         return res.status(code || httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: message || "An error occurred" });
