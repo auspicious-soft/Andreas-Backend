@@ -53,7 +53,7 @@ export const deleteAattachmentService = async (id: string, res: Response) => {
 
   await attachmentsModel.findByIdAndDelete(id);
 
-  return {
+  return { 
     success: true,
     message: "Attachments deleted successfully",
   };
