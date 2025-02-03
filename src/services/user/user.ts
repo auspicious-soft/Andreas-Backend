@@ -13,6 +13,8 @@ import { customAlphabet } from "nanoid"
 import { sendNotificationToUserService } from "../notifications/notifications"
 import mongoose from "mongoose"
 import { tabsModel } from "src/models/tab-schema";
+import { attachmentsModel } from "src/models/attachments-schema";
+import { deleteFileFromS3 } from "src/configF/s3";
 
 
 export const signupService = async (payload: any, res: Response) => {
@@ -240,6 +242,15 @@ export const createTabService = async (payload: any, res: Response) => {
 
 export const deleteATabService = async (id: string, res: Response) => {
     const response = await tabsModel.findByIdAndDelete(id)
+    if (!response) return errorResponseHandler("Tab not found", httpStatusCode.NOT_FOUND, res)
+    const tabNameType = response.name
+    const attachments = await attachmentsModel.find({ type: tabNameType })
+    if (attachments.length > 0) {
+        for (let i of attachments) {
+            await deleteFileFromS3(i.url)
+        }
+        await attachmentsModel.deleteMany({ type: tabNameType })
+    }
     return {
         success: true,
         message: "Tab deleted successfully",

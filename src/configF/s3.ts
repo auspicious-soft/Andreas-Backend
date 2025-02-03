@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import axios from 'axios';
 import { configDotenv } from 'dotenv';
@@ -30,5 +30,21 @@ export const generateSignedUrlToUploadOn = async (fileName: string, fileType: st
     } catch (error) {
         console.error("Error generating signed URL:", error);
         throw error;
+    }
+}
+
+export const deleteFileFromS3 = async (imageKey: string) => {
+    const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: imageKey,
+    }
+    try {
+        const s3Client = await createS3Client()
+        const command = new DeleteObjectCommand(params)
+        const response = await s3Client.send(command)
+        return response
+    } catch (error) {
+        console.error('Error deleting file from S3:', error)
+        throw error
     }
 }
