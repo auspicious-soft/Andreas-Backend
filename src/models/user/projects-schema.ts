@@ -17,6 +17,13 @@ const projectsSchema = new Schema({
     createdby: { type: String, required: true },
     constructionAddress: { type: String, required: false },
     homeAddress: { type: String, required: false },
+    timeFrame: [{
+        startDate: { type: Date, required: false },
+        endDate: { type: Date, required: false },
+        status: { type: String, required: false },
+        color: { type: String, required: false },
+        name: { type: String, required: false },
+    }]
 }, { timestamps: true })
 
 export const projectsModel = model("projects", projectsSchema)
