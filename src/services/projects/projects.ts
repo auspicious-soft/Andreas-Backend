@@ -138,11 +138,11 @@ export const updateAProjectService = async (payload: any, res: Response) => {
     const currentUserId = payload.currentUser;
     const project = await projectsModel.findById(payload.id);
     if (!project) return errorResponseHandler("Project not found", httpStatusCode.NOT_FOUND, res);
-    if(payload.status) {
-        if(project.status?.includes(payload.status)) delete finalPayload.status
+    if (payload.status) {
+        if (project.status?.includes(payload.status)) delete finalPayload.status
         else finalPayload.status = [...project.status!, payload.status]
     }
-    
+
     const updatedProject = await projectsModel.findByIdAndUpdate(payload.id, { ...finalPayload }, { new: true });
     return {
         success: true,
@@ -194,5 +194,41 @@ export const deleteProjectService = async (payload: any, res: Response, session:
         success: true,
         message: "Project deleted successfully",
         data: response
+    }
+}
+
+
+export const addTimeFrameToProjectService = async (payload: any, res: Response) => {
+    const { projectId, ...rest } = payload;
+    const project = await projectsModel.findById(projectId);
+    if (!project) return errorResponseHandler("Project not found", httpStatusCode.NOT_FOUND, res)
+    const timeframe = project.timeframe;
+    for (const i of timeframe) {
+        if (i.name === rest.name) {
+            return errorResponseHandler("Timeframe name already exists", httpStatusCode.BAD_REQUEST, res)
+        }
+    }
+    const updatedProject = timeframe.push({ ...rest })
+    await project.save();
+    return {
+        success: true,
+        message: "Timeframe added to project successfully",
+        data: updatedProject
+    }
+}
+
+export const updateTimeFrameToProjectService = async (payload: any, res: Response) => {
+    const { timeFrameId, projectId, ...rest } = payload
+    const project = await projectsModel.findById(projectId);
+    if (!project) return errorResponseHandler("Project not found", httpStatusCode.NOT_FOUND, res)
+    const timeframe = project.timeframe;
+    const index = timeframe.findIndex((i: any) => i._id == timeFrameId)
+    if (index === -1) return errorResponseHandler("Timeframe not found", httpStatusCode.NOT_FOUND, res)
+    timeframe[index] = { ...rest }
+    await project.save();
+    return {
+        success: true,
+        message: "Timeframe updated successfully",
+        data: project
     }
 }

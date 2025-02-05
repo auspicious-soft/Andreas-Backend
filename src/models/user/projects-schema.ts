@@ -17,11 +17,11 @@ const projectsSchema = new Schema({
     createdby: { type: String, required: true },
     constructionAddress: { type: String, required: false },
     homeAddress: { type: String, required: false },
-    timeFrame: [{
+    timeframe: [{
         startDate: { type: Date, required: false },
         endDate: { type: Date, required: false },
         status: { type: String, required: false },
-        color: { type: String, required: false },
+        progress: { type: Number, required: false, min: 0, max: 100 },
         name: { type: String, required: false },
     }]
 }, { timestamps: true })
