@@ -232,3 +232,19 @@ export const updateTimeFrameToProjectService = async (payload: any, res: Respons
         data: project
     }
 }
+
+export const deleteTimeFrameFromProjectService = async (payload: any, res: Response) => {
+    const { timeFrameId, projectId } = payload
+    const project = await projectsModel.findById(projectId);
+    if (!project) return errorResponseHandler("Project not found", httpStatusCode.NOT_FOUND, res)
+    const timeframe = project.timeframe;
+    const index = timeframe.findIndex((i: any) => i._id == timeFrameId)
+    if (index === -1) return errorResponseHandler("Timeframe not found", httpStatusCode.NOT_FOUND, res)
+    timeframe.splice(index, 1)
+    await project.save();
+    return {
+        success: true,
+        message: "Timeframe deleted successfully",
+        data: project
+    }
+}

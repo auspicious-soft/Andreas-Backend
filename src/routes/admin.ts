@@ -19,7 +19,8 @@ import {
     updateAProject,
     getAllProjects,
     addTimeFrameToProject,
-    updateTimeFrameToProject
+    updateTimeFrameToProject,
+    deleteTimeFrameFromProject
 } from "src/controllers/projects/projects";
 
 import {
@@ -70,7 +71,7 @@ router.route("/employee/:id").get(checkAuth, getEmployee).delete(checkAuth, dele
 
 
 router.post("/project-timeframe", checkAuth, addTimeFrameToProject)
-router.patch("/project-timeframe/:timeFrameId", checkAuth, updateTimeFrameToProject)
+router.route("/project-timeframe/:timeFrameId").patch(checkAuth, updateTimeFrameToProject).delete(checkAuth, deleteTimeFrameFromProject)
 
 // router.get("/verify-session", verifySession);
 // router.patch("/update-password", passwordReset)

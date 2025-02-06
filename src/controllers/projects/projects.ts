@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import { httpStatusCode } from "src/lib/constant";
 import { errorParser } from "src/lib/errors/error-response-handler";
-import { getAllProjectService, createProjectService, getAprojectService, deleteAProjectService, updateAProjectService, getUserProjectsService, deleteProjectService, addTimeFrameToProjectService, updateTimeFrameToProjectService } from "src/services/projects/projects";
+import { getAllProjectService, createProjectService, getAprojectService, deleteAProjectService, updateAProjectService, getUserProjectsService, deleteProjectService, addTimeFrameToProjectService, updateTimeFrameToProjectService, deleteTimeFrameFromProjectService } from "src/services/projects/projects";
 
 
 export const getAllProjects = async (req: Request, res: Response) => {
@@ -100,6 +100,16 @@ export const addTimeFrameToProject = async (req: Request, res: Response) => {
 export const updateTimeFrameToProject = async (req: Request, res: Response) => {
     try {
         const response = await updateTimeFrameToProjectService({ currentUser: (req as any).currentUser, ...req.body, timeFrameId: req.params.timeFrameId }, res)
+        return res.status(httpStatusCode.CREATED).json(response)
+    } catch (error: any) {
+        const { code, message } = errorParser(error)
+        return res.status(code || httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: message || "An error occurred" });
+    }
+}
+
+export const deleteTimeFrameFromProject = async (req: Request, res: Response) => {
+    try {
+        const response = await deleteTimeFrameFromProjectService({ currentUser: (req as any).currentUser, ...req.body.data, timeFrameId: req.params.timeFrameId }, res)
         return res.status(httpStatusCode.CREATED).json(response)
     } catch (error: any) {
         const { code, message } = errorParser(error)
