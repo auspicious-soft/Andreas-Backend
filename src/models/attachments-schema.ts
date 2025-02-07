@@ -6,6 +6,7 @@ const attachmentsSchema = new Schema({
     projectid: { type: Schema.Types.ObjectId, required: true, ref: "projects" },
     createdby: { type: Schema.Types.ObjectId, required: true, ref: "users" },
     type: { type: String, required: true },
+    fullName: { type: String, required: true },
 }, { timestamps: true })
 
 export const attachmentsModel = model("attachments", attachmentsSchema)

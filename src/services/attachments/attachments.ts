@@ -73,6 +73,7 @@ export const createattachmentService = async (payload: any, res: Response) => {
     createdby: currentUserId,
     identifier: customAlphabet("0123456789", 5)(), // Optional: Create a unique identifier for the note
     type: payload.type,
+    fullName: payload.fullName,
   });
 
   // Save the note
