@@ -3,7 +3,7 @@ import { Schema, model } from "mongoose";
 const projectsSchema = new Schema({
     identifier: { type: String, unique: true },
     projectName: { type: String, required: true },
-    userId: { type: Schema.Types.ObjectId, required: true, ref: "users" },
+    userId: { type: Schema.Types.ObjectId, required: false, ref: "users" },
     projectimageLink: { type: String, required: false },
     projectstartDate: { type: String, required: false },
     projectendDate: { type: String, required: false },
