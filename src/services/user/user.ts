@@ -15,6 +15,7 @@ import mongoose from "mongoose"
 import { tabsModel } from "src/models/tab-schema";
 import { attachmentsModel } from "src/models/attachments-schema";
 import { deleteFileFromS3 } from "src/configF/s3";
+import { employeeModel } from "src/models/admin/employees-schema";
 
 
 export const signupService = async (payload: any, res: Response) => {
@@ -95,7 +96,6 @@ export const newPassswordAfterOTPVerifiedService = async (payload: { password: s
     const existingToken = await getPasswordResetTokenByToken(otp)
     if (!existingToken) return errorResponseHandler("Invalid OTP", httpStatusCode.BAD_REQUEST, res)
 
-    // console.log("existingToken", existingToken);
 
     const hasExpired = new Date(existingToken.expires) < new Date()
     if (hasExpired) return errorResponseHandler("OTP expired", httpStatusCode.BAD_REQUEST, res)
@@ -107,32 +107,23 @@ export const newPassswordAfterOTPVerifiedService = async (payload: { password: s
         if (!existingClient) {
             existingClient = await usersModel.findOne({ email: existingToken.email });
         }
-        if (!existingClient) return errorResponseHandler('User not found', httpStatusCode.NOT_FOUND, res);
-
-    }
-    else if (existingToken.phoneNumber) {
-
-        existingClient = await usersModel.findOne({ phoneNumber: existingToken.phoneNumber });
         if (!existingClient) {
-            existingClient = await usersModel.findOne({ phoneNumber: existingToken.phoneNumber });
+            existingClient = await employeeModel.findOne({ email: existingToken.email });
         }
         if (!existingClient) return errorResponseHandler('User not found', httpStatusCode.NOT_FOUND, res);
 
     }
-
-    // console.log('existingClient',existingClient)
-
     const hashedPassword = await bcrypt.hash(password, 10)
-
     if (existingClient.role == 'admin') {
-        const response = await adminModel.findByIdAndUpdate(existingClient._id, { password: hashedPassword }, { new: true })
-    } else {
-        const response = await usersModel.findByIdAndUpdate(existingClient._id, { password: hashedPassword }, { new: true })
+        await adminModel.findByIdAndUpdate(existingClient._id, { password: hashedPassword }, { new: true })
+    } 
+    else if (existingClient.role == 'employee') {
+        await employeeModel.findByIdAndUpdate(existingClient._id, { password: hashedPassword }, { new: true })
     }
-
-
-
-    // await passwordResetTokenModel.findByIdAndDelete(existingToken._id)
+    else {
+        await usersModel.findByIdAndUpdate(existingClient._id, { password: hashedPassword }, { new: true })
+    }
+    await passwordResetTokenModel.findByIdAndDelete(existingToken._id)
 
     return {
         success: true,

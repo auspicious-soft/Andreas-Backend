@@ -19,7 +19,7 @@ const router = Router();
 
 router.post("/signup", signup)
 router.post("/login", login)
-router.patch("/forgot-password", forgotPassword)
+// router.patch("/forgot-password", forgotPassword)
 router.get("/dashboard", checkAuth, getDashboardStats)
 router.get("/:id/projects", checkAuth, getUserProjects)
 router.route("/:id").get(checkAuth, getUserInfo).put(checkAuth, editUserInfo)

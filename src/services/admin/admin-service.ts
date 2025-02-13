@@ -74,38 +74,19 @@ export const loginService = async (payload: any, res: Response) => {
 
 export const forgotPasswordService = async (payload: any, res: Response) => {
     const { username } = payload;
-    const toNumber = Number(username);
-    const isEmail = isNaN(toNumber);
+    const models = [adminModel, usersModel, employeeModel];
     let user: any = null;
-    if (isEmail) {
-
-        user = await adminModel.findOne({ email: username }).select('+password');
-        if (!user) {
-            user = await usersModel.findOne({ email: username }).select('+password');
-        }
-        if (!user) return errorResponseHandler('User not found', httpStatusCode.NOT_FOUND, res);
-
-        const passwordResetToken = await generatePasswordResetToken(username);
-        if (passwordResetToken) {
-            await sendPasswordResetEmail(username, passwordResetToken.token);
-            return { success: true, message: "Password reset email sent with OTP" };
-        }
-    } else {
-        const formattedPhoneNumber = `${username}`;
-        user = await adminModel.findOne({ phoneNumber: formattedPhoneNumber }).select('+password');
-        if (!user) {
-            user = await usersModel.findOne({ phoneNumber: formattedPhoneNumber }).select('+password');
-        }
-        if (!user) return errorResponseHandler('User not found', httpStatusCode.NOT_FOUND, res);
-
-        const passwordResetTokenBySms = await generatePasswordResetTokenByPhone(formattedPhoneNumber);
-        if (passwordResetTokenBySms) {
-            await generatePasswordResetTokenByPhoneWithTwilio(formattedPhoneNumber, passwordResetTokenBySms.token);
-            return { success: true, message: "Password reset SMS sent with OTP" };
-        }
+    for (const model of models) {
+        user = await (model as any).findOne({ email: username }).select('+password')
+        if (user) break;                                        
     }
-
-    return errorResponseHandler('Failed to generate password reset token', httpStatusCode.INTERNAL_SERVER_ERROR, res);
+    if (!user) return errorResponseHandler('User not found', httpStatusCode.NOT_FOUND, res);
+    const token = await generatePasswordResetToken(user.email)
+    await sendPasswordResetEmail(user.email, token.token)
+    return {
+        success: true,
+        message: "Password reset email sent successfully",
+    };
 };
 
 
@@ -239,7 +220,7 @@ export const createAUserService = async (payload: any, res: Response) => {
         password: hashedPassword,
         identifier
     })
-    const userResponse: any = user.toJSON();    
+    const userResponse: any = user.toJSON();
     delete userResponse.password;
     await sendEmailOfManualUserCreation(payload.email, payload.password)
     return {
