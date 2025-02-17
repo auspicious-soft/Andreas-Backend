@@ -8,6 +8,7 @@ import { errorResponseHandler } from 'src/lib/errors/error-response-handler';
 import { httpStatusCode } from 'src/lib/constant';
 import { isEmailTaken, queryBuilder } from 'src/utils';
 import { projectsModel } from 'src/models/user/projects-schema';
+import { sendEmailOfManualUserCreation } from 'src/utils/mails/mail';
 
 export const getAllEmployeesService = async (payload: any) => {
     const page = parseInt(payload.page as string) || 1;
@@ -97,7 +98,7 @@ export const createEmployeeService = async (payload: any, res: Response) => {
 
     const employeeResponse: any = employee.toJSON();
     delete employeeResponse.password;
-
+    await sendEmailOfManualUserCreation(payload.email, payload.password)
     return {
         success: true,
         message: "Employee created successfully",
