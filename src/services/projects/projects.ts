@@ -179,8 +179,20 @@ export const deleteAProjectService = async (id: string, res: Response) => {
     }
 }
 
-
-
+export const deleteAProjectStatusService = async (payload: any, res: Response) => {
+    const project: any = await projectsModel.findById(payload.id);
+    if (!project) return errorResponseHandler("Project not found", httpStatusCode.NOT_FOUND, res)
+    const status = payload.status;
+    const index = project.status.findIndex((i: any) => i == status)
+    if (index === -1) return errorResponseHandler("Status not found", httpStatusCode.NOT_FOUND, res)
+    project.status.splice(index, 1)
+    await project.save();
+    return {
+        success: true,
+        message: "Status deleted successfully",
+        data: project
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
