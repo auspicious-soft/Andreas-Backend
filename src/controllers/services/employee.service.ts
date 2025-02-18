@@ -11,8 +11,8 @@ import { projectsModel } from 'src/models/user/projects-schema';
 import { sendEmailOfManualUserCreation } from 'src/utils/mails/mail';
 
 export const getAllEmployeesService = async (payload: any) => {
-    const page = parseInt(payload.page as string) || 1;
-    const limit = parseInt(payload.limit as string) || 0;
+    const page = parseInt(payload.page as string);
+    const limit = parseInt(payload.limit as string);
     const offset = (page - 1) * limit;
     const { query, sort } = queryBuilder(payload, ['fullName']);
 
