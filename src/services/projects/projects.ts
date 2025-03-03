@@ -64,13 +64,13 @@ export const getUserProjectsService = async (payload: any, res: Response) => {
 
     if (payload.state) {
         if (payload.state === "ongoing") {
-            (query as any).status = { $ne: "4" };
+            (query as any).progress = { $ne: 100 };
         } else if (payload.state === "completed") {
-            (query as any).status = "4";
+            (query as any).progress = 100;
         }
     }
 
-    (query as any).userId = id;
+    (query as any).userId = { $in: [id] };
 
     const totalDataCount = Object.keys(query).length < 1 ? await projectsModel.countDocuments() : await projectsModel.countDocuments(query);
     const results = await projectsModel
