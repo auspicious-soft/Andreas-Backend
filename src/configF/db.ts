@@ -11,6 +11,12 @@ const connectDB = async () => {
     try {
       await mongoose.connect(process.env.MONGO_URL as string);
       console.log("MongoDB connected 🚀");
+      // const result = await projectsModel.updateMany(
+      //   { userId: { $exists: true, $not: { $type: 'array' } } },
+      //   [{ $set: { userId: ['$userId'] } }]
+      // );
+      
+      // console.log(`Migration completed. Modified ${result.modifiedCount} documents.`);
     } catch (error: any) {
       attempt += 1;
       console.error(`MongoDB connection attempt ${attempt} failed: ${error.message}`);
